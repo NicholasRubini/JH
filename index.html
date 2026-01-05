@@ -1,0 +1,2107 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="HǪPP">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#D4AF37">
+    <meta name="format-detection" content="telephone=no">
+    
+    <title>HǪPP - Jump Height Estimator</title>
+    
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkhPUFAgLSBKdW1wIEhlaWdodCBFc3RpbWF0b3IiLAogICJzaG9ydF9uYW1lIjogIkhPUFAiLAogICJkZXNjcmlwdGlvbiI6ICJTdGltYSBsJ2FsdGV6emEgZGVsIHNhbHRvIGNvbiBhbmFsaXNpIHZpZGVvIGZsaWdodCB0aW1lIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwRDBEMEQiLAogICJ0aGVtZV9jb2xvciI6ICIjRDRBRjM3IiwKICAib3JpZW50YXRpb24iOiAicG9ydHJhaXQiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWwsPHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA1MTIgNTEyJz48cmVjdCBmaWxsPSclMjMwRDBEMEQnIHdpZHRoPSc1MTInIGhlaWdodD0nNTEyJyByeD0nNjQnLz48dGV4dCB4PScyNTYnIHk9JzMyMCcgZm9udC1zaXplPScyMjAnIHRleHQtYW5jaG9yPSdtaWRkbGUnIGZpbGw9JyUyM0Q0QUYzNyc+4ZqoPC90ZXh0Pjwvc3ZnPiIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAgICAgInR5cGUiOiAiaW1hZ2Uvc3ZnK3htbCIsCiAgICAgICJwdXJwb3NlIjogImFueSBtYXNrYWJsZSIKICAgIH0KICBdLAogICJjYXRlZ29yaWVzIjogWyJmaXRuZXNzIiwgInNwb3J0cyIsICJ1dGlsaXRpZXMiXSwKICAibGFuZyI6ICJpdCIKfQ==">
+    
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%230D0D0D' width='512' height='512' rx='64'/><text x='256' y='320' font-size='220' text-anchor='middle' fill='%23D4AF37'>ᚺ</text></svg>">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --nero-carbone: #0D0D0D;
+            --oro-runico: #D4AF37;
+            --grigio-profondo: #1A1A1A;
+            --bianco-ghiaccio: #F5F5F5;
+            --oro-dim: rgba(212, 175, 55, 0.15);
+            --oro-glow: rgba(212, 175, 55, 0.4);
+            --safe-top: env(safe-area-inset-top);
+            --safe-bottom: env(safe-area-inset-bottom);
+            --safe-left: env(safe-area-inset-left);
+            --safe-right: env(safe-area-inset-right);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--nero-carbone);
+            color: var(--bianco-ghiaccio);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-top: var(--safe-top);
+            padding-bottom: var(--safe-bottom);
+            padding-left: var(--safe-left);
+            padding-right: var(--safe-right);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 30% 10%, var(--oro-dim) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 90%, var(--oro-dim) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .app {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 1.5rem 0 1rem;
+            flex-shrink: 0;
+        }
+
+        .logo-rune {
+            font-size: 2rem;
+            color: var(--oro-runico);
+            letter-spacing: 0.4rem;
+            text-shadow: 0 0 20px var(--oro-glow);
+        }
+
+        h1 {
+            font-family: 'Cinzel', Georgia, serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--bianco-ghiaccio);
+            letter-spacing: 0.2rem;
+            margin: 0.3rem 0;
+        }
+
+        .subtitle {
+            color: rgba(245, 245, 245, 0.5);
+            font-size: 0.75rem;
+            letter-spacing: 0.15rem;
+            text-transform: uppercase;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.08), rgba(212, 175, 55, 0.03));
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .info-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.9rem 1rem;
+            cursor: pointer;
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .info-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--oro-runico);
+        }
+
+        .info-toggle {
+            font-size: 1.2rem;
+            color: var(--oro-runico);
+            transition: transform 0.3s ease;
+        }
+
+        .info-box.open .info-toggle {
+            transform: rotate(180deg);
+        }
+
+        .info-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .info-box.open .info-content {
+            max-height: 2000px;
+        }
+
+        .info-inner {
+            padding: 1rem;
+            padding-top: 0;
+        }
+
+        .info-section {
+            margin-bottom: 1rem;
+        }
+
+        .info-section h4 {
+            font-size: 0.8rem;
+            color: var(--bianco-ghiaccio);
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-section ul {
+            list-style: none;
+        }
+
+        .info-section li {
+            padding: 0.3rem 0;
+            padding-left: 1.2rem;
+            position: relative;
+            font-size: 0.85rem;
+            color: rgba(245, 245, 245, 0.7);
+        }
+
+        .info-section li::before {
+            content: '›';
+            position: absolute;
+            left: 0;
+            color: var(--oro-runico);
+        }
+
+        .fps-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .fps-table th, .fps-table td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+        }
+
+        .fps-table th {
+            color: var(--oro-runico);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        .accuracy-badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .accuracy-low { background: rgba(255, 107, 107, 0.2); color: #FF6B6B; }
+        .accuracy-med { background: rgba(255, 193, 7, 0.2); color: #FFC107; }
+        .accuracy-high { background: rgba(78, 205, 196, 0.2); color: #4ECDC4; }
+        .accuracy-max { background: rgba(212, 175, 55, 0.2); color: var(--oro-runico); }
+
+        .tip-highlight {
+            background: rgba(212, 175, 55, 0.1);
+            border-left: 3px solid var(--oro-runico);
+            padding: 0.6rem 0.8rem;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: rgba(245, 245, 245, 0.8);
+        }
+
+        /* Sport Benchmarks - UNIFIED */
+        .sport-benchmarks {
+            display: grid;
+            gap: 0.3rem;
+        }
+
+        .sport-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto auto;
+            gap: 0.4rem;
+            align-items: center;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+            font-size: 0.75rem;
+        }
+
+        .sport-name {
+            color: var(--bianco-ghiaccio);
+            font-weight: 600;
+        }
+
+        .sport-level {
+            text-align: center;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            min-width: 40px;
+        }
+
+        .level-avg { background: rgba(255, 193, 7, 0.15); color: #FFC107; }
+        .level-good { background: rgba(78, 205, 196, 0.15); color: #4ECDC4; }
+        .level-elite { background: rgba(212, 175, 55, 0.2); color: var(--oro-runico); }
+
+        /* Jump Type Selector */
+        .jump-type-section {
+            margin-bottom: 1rem;
+        }
+
+        .section-label {
+            font-size: 0.8rem;
+            color: rgba(245, 245, 245, 0.6);
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+        }
+
+        .jump-type-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .jump-type-btn {
+            background: var(--grigio-profondo);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 10px;
+            padding: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .jump-type-btn:active {
+            transform: scale(0.97);
+        }
+
+        .jump-type-btn.selected {
+            border-color: var(--oro-runico);
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.05));
+            box-shadow: 0 0 15px var(--oro-dim);
+        }
+
+        .jump-type-btn .type-name {
+            font-weight: 700;
+            color: var(--bianco-ghiaccio);
+            font-size: 0.9rem;
+        }
+
+        .jump-type-btn.selected .type-name {
+            color: var(--oro-runico);
+        }
+
+        .jump-type-btn .type-desc {
+            font-size: 0.7rem;
+            color: rgba(245, 245, 245, 0.5);
+            margin-top: 0.2rem;
+        }
+
+        .jump-type-note {
+            font-size: 0.75rem;
+            color: rgba(245, 245, 245, 0.5);
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 6px;
+            display: none;
+        }
+
+        .jump-type-note.visible {
+            display: block;
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            border: 2px dashed rgba(212, 175, 55, 0.5);
+            border-radius: 12px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--grigio-profondo);
+            margin-bottom: 1rem;
+        }
+
+        .upload-zone:active {
+            transform: scale(0.98);
+            border-color: var(--oro-runico);
+            background: var(--oro-dim);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .upload-text {
+            color: var(--bianco-ghiaccio);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .upload-hint {
+            font-size: 0.8rem;
+            color: rgba(245, 245, 245, 0.5);
+            margin-top: 0.3rem;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Video Section */
+        .video-section {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .video-section.active {
+            display: flex;
+        }
+
+        .video-wrapper {
+            position: relative;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        video {
+            display: block;
+            width: 100%;
+            max-height: 35vh;
+            object-fit: contain;
+            background: #000;
+        }
+
+        .scrubber-container {
+            padding: 0.8rem 1rem;
+            background: rgba(26, 26, 26, 0.95);
+            border-radius: 0 0 12px 12px;
+            margin-top: -12px;
+        }
+
+        .frame-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.6rem;
+        }
+
+        .frame-info {
+            font-family: 'Cinzel', Georgia, serif;
+            color: var(--oro-runico);
+            font-size: 1.1rem;
+        }
+
+        .time-info {
+            font-size: 0.85rem;
+            color: rgba(245, 245, 245, 0.6);
+        }
+
+        .scrubber {
+            width: 100%;
+            height: 44px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+            touch-action: none;
+        }
+
+        .scrubber::-webkit-slider-runnable-track {
+            height: 8px;
+            background: var(--grigio-profondo);
+            border-radius: 4px;
+        }
+
+        .scrubber::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 28px;
+            height: 28px;
+            background: var(--oro-runico);
+            border-radius: 50%;
+            margin-top: -10px;
+            box-shadow: 0 0 15px var(--oro-glow);
+        }
+
+        .scrubber::-moz-range-track {
+            height: 8px;
+            background: var(--grigio-profondo);
+            border-radius: 4px;
+        }
+
+        .scrubber::-moz-range-thumb {
+            width: 28px;
+            height: 28px;
+            background: var(--oro-runico);
+            border-radius: 50%;
+            border: none;
+        }
+
+        .video-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+        }
+
+        .ctrl-btn {
+            background: var(--grigio-profondo);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 10px;
+            color: var(--bianco-ghiaccio);
+            padding: 0.9rem 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .ctrl-btn:active {
+            transform: scale(0.95);
+            background: var(--oro-dim);
+        }
+
+        .ctrl-btn .icon {
+            font-size: 1.3rem;
+        }
+
+        /* Mark Section - supports DJ with 3 marks */
+        .mark-section {
+            margin-bottom: 1rem;
+        }
+
+        .mark-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+        }
+
+        .mark-buttons.three-marks {
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .mark-btn {
+            background: linear-gradient(135deg, var(--grigio-profondo), rgba(212, 175, 55, 0.08));
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            border-radius: 12px;
+            color: var(--bianco-ghiaccio);
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .mark-buttons.three-marks .mark-btn {
+            padding: 0.7rem 0.5rem;
+        }
+
+        .mark-btn:active {
+            transform: scale(0.97);
+        }
+
+        .mark-btn .label {
+            display: block;
+            font-size: 0.75rem;
+            color: rgba(245, 245, 245, 0.6);
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+        }
+
+        .mark-buttons.three-marks .mark-btn .label {
+            font-size: 0.65rem;
+        }
+
+        .mark-btn .frame-val {
+            font-family: 'Cinzel', Georgia, serif;
+            font-size: 1.4rem;
+            color: var(--oro-runico);
+        }
+
+        .mark-buttons.three-marks .mark-btn .frame-val {
+            font-size: 1.1rem;
+        }
+
+        .mark-btn.contact-btn.marked {
+            border-color: #9B59B6;
+            box-shadow: 0 0 20px rgba(155, 89, 182, 0.3);
+        }
+
+        .mark-btn.contact-btn.marked .frame-val {
+            color: #9B59B6;
+        }
+
+        .mark-btn.takeoff-btn.marked {
+            border-color: #FF6B6B;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .mark-btn.takeoff-btn.marked .frame-val {
+            color: #FF6B6B;
+        }
+
+        .mark-btn.landing-btn.marked {
+            border-color: #4ECDC4;
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .mark-btn.landing-btn.marked .frame-val {
+            color: #4ECDC4;
+        }
+
+        /* FPS Section */
+        .fps-section {
+            margin-bottom: 1rem;
+        }
+
+        .fps-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .fps-select {
+            flex: 1;
+            padding: 0.9rem 1rem;
+            background: var(--grigio-profondo);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 10px;
+            color: var(--bianco-ghiaccio);
+            font-family: 'Source Sans Pro', sans-serif;
+            font-size: 1rem;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23D4AF37' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.2rem;
+        }
+
+        .fps-select:focus {
+            outline: none;
+            border-color: var(--oro-runico);
+        }
+
+        .fps-badge {
+            padding: 0.5rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .fps-badge.auto {
+            background: linear-gradient(135deg, var(--oro-runico), #B8963C);
+            color: var(--nero-carbone);
+        }
+
+        .fps-badge.manual {
+            background: var(--grigio-profondo);
+            border: 1px solid rgba(245, 245, 245, 0.3);
+            color: rgba(245, 245, 245, 0.6);
+        }
+
+        .custom-fps-input {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            background: var(--grigio-profondo);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 10px;
+            color: var(--bianco-ghiaccio);
+            font-size: 1rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .custom-fps-input.visible {
+            display: block;
+        }
+
+        /* FPS Confirmation Banner */
+        .fps-confirm-banner {
+            display: none;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.05));
+            border: 1px solid var(--oro-runico);
+            border-radius: 10px;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .fps-confirm-banner.visible {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fps-confirm-text {
+            font-size: 0.85rem;
+            color: var(--bianco-ghiaccio);
+            margin-bottom: 0.6rem;
+        }
+
+        .fps-confirm-text strong {
+            color: var(--oro-runico);
+        }
+
+        .fps-confirm-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .fps-confirm-btn {
+            flex: 1;
+            padding: 0.6rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .fps-confirm-btn.confirm {
+            background: var(--oro-runico);
+            border: none;
+            color: var(--nero-carbone);
+        }
+
+        .fps-confirm-btn.change {
+            background: transparent;
+            border: 1px solid rgba(245, 245, 245, 0.3);
+            color: rgba(245, 245, 245, 0.8);
+        }
+
+        .fps-confirm-btn:active {
+            transform: scale(0.97);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, var(--oro-runico), #B8963C);
+            border: none;
+            border-radius: 12px;
+            color: var(--nero-carbone);
+            font-family: 'Cinzel', Georgia, serif;
+            font-size: 1.1rem;
+            font-weight: 900;
+            letter-spacing: 0.15rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .calculate-btn:active {
+            transform: scale(0.98);
+        }
+
+        .calculate-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Results */
+        .results {
+            display: none;
+            text-align: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(212, 175, 55, 0.03));
+            border: 2px solid var(--oro-runico);
+            border-radius: 16px;
+            margin-bottom: 1rem;
+        }
+
+        .results.visible {
+            display: block;
+            animation: resultPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes resultPop {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .result-label {
+            font-size: 0.75rem;
+            color: rgba(245, 245, 245, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.15rem;
+        }
+
+        .result-value {
+            font-family: 'Cinzel', Georgia, serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--oro-runico);
+            text-shadow: 0 0 30px var(--oro-glow);
+            line-height: 1;
+        }
+
+        .result-unit {
+            font-size: 1.3rem;
+            color: rgba(245, 245, 245, 0.7);
+        }
+
+        .result-jump-type {
+            font-size: 0.8rem;
+            color: rgba(245, 245, 245, 0.6);
+            margin-top: 0.3rem;
+        }
+
+        .result-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-top: 1.2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .result-stats.four-cols {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Cinzel', Georgia, serif;
+            font-size: 1.2rem;
+            color: var(--bianco-ghiaccio);
+        }
+
+        .result-stats.four-cols .stat-value {
+            font-size: 1rem;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: rgba(245, 245, 245, 0.5);
+            text-transform: uppercase;
+        }
+
+        .result-stats.four-cols .stat-label {
+            font-size: 0.55rem;
+        }
+
+        /* RSI highlight for DJ */
+        .stat-item.rsi-highlight .stat-value {
+            color: var(--oro-runico);
+        }
+
+        .rating-badge {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1.2rem;
+            background: var(--grigio-profondo);
+            border: 1px solid var(--oro-runico);
+            border-radius: 20px;
+            font-family: 'Cinzel', Georgia, serif;
+            font-size: 0.85rem;
+        }
+
+        /* Share Button */
+        .share-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 1rem;
+            margin-top: 1rem;
+            background: linear-gradient(135deg, #E1306C, #C13584, #833AB4);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .share-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Upsell CTA */
+        .upsell-section {
+            margin-top: 1.2rem;
+            padding-top: 1.2rem;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .upsell-title {
+            font-size: 0.75rem;
+            color: rgba(245, 245, 245, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .upsell-cards {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .upsell-card {
+            display: block;
+            background: var(--grigio-profondo);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .upsell-card:active {
+            transform: scale(0.98);
+            border-color: var(--oro-runico);
+        }
+
+        .upsell-card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .upsell-icon {
+            font-size: 1.5rem;
+        }
+
+        .upsell-card-title {
+            font-family: 'Cinzel', Georgia, serif;
+            color: var(--oro-runico);
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .upsell-card-desc {
+            font-size: 0.8rem;
+            color: rgba(245, 245, 245, 0.7);
+            line-height: 1.4;
+        }
+
+        .upsell-card-cta {
+            display: inline-block;
+            margin-top: 0.6rem;
+            font-size: 0.75rem;
+            color: var(--oro-runico);
+            font-weight: 600;
+        }
+
+        /* Benchmark bars in results */
+        .benchmarks-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .benchmarks-title {
+            font-size: 0.7rem;
+            color: rgba(245, 245, 245, 0.5);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .benchmark-bar {
+            position: relative;
+            height: 28px;
+            background: var(--grigio-profondo);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 0.4rem;
+        }
+
+        .benchmark-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(212, 175, 55, 0.3), rgba(212, 175, 55, 0.1));
+        }
+
+        .benchmark-marker {
+            position: absolute;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--oro-runico);
+            box-shadow: 0 0 8px var(--oro-glow);
+            z-index: 2;
+        }
+
+        .benchmark-labels {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 0.5rem;
+            font-size: 0.65rem;
+            z-index: 1;
+        }
+
+        .benchmark-sport {
+            color: var(--bianco-ghiaccio);
+            font-weight: 600;
+        }
+
+        .benchmark-range {
+            color: rgba(245, 245, 245, 0.5);
+        }
+
+        .reset-btn {
+            width: 100%;
+            padding: 1rem;
+            background: transparent;
+            border: 1px solid rgba(245, 245, 245, 0.25);
+            border-radius: 10px;
+            color: rgba(245, 245, 245, 0.6);
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        .reset-btn:active {
+            background: rgba(245, 245, 245, 0.05);
+        }
+
+        .method-info {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: rgba(245, 245, 245, 0.5);
+            line-height: 1.5;
+        }
+
+        .method-info code {
+            color: var(--oro-runico);
+            background: rgba(212, 175, 55, 0.1);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem 0 1rem;
+            margin-top: auto;
+        }
+
+        .footer-brand {
+            font-family: 'Cinzel', Georgia, serif;
+            color: var(--oro-runico);
+            font-size: 0.75rem;
+            letter-spacing: 0.15rem;
+        }
+
+        .footer-rune {
+            color: var(--oro-runico);
+            letter-spacing: 0.25rem;
+            font-size: 0.8rem;
+            margin-top: 0.2rem;
+        }
+
+        #share-canvas {
+            display: none;
+        }
+
+        .install-prompt {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem;
+            padding-bottom: calc(1rem + var(--safe-bottom));
+            background: linear-gradient(to top, var(--grigio-profondo), rgba(26, 26, 26, 0.95));
+            border-top: 1px solid rgba(212, 175, 55, 0.3);
+            z-index: 100;
+        }
+
+        .install-prompt.visible {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .install-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .install-icon {
+            font-size: 2rem;
+        }
+
+        .install-text {
+            flex: 1;
+        }
+
+        .install-text strong {
+            display: block;
+            color: var(--bianco-ghiaccio);
+        }
+
+        .install-text span {
+            font-size: 0.8rem;
+            color: rgba(245, 245, 245, 0.6);
+        }
+
+        .install-close {
+            background: none;
+            border: none;
+            color: rgba(245, 245, 245, 0.5);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header>
+            <div class="logo-rune">ᚺ ᛟ ᛈ ᛈ</div>
+            <h1>HǪPP</h1>
+            <p class="subtitle">Flight Time Jump Analysis</p>
+        </header>
+
+        <main>
+            <!-- Tips Info Box -->
+            <div class="info-box" id="tips-box">
+                <div class="info-header" onclick="toggleInfo('tips-box')">
+                    <div class="info-title">
+                        <span>📹</span> Come Filmare per Massima Accuratezza
+                    </div>
+                    <span class="info-toggle">▼</span>
+                </div>
+                <div class="info-content">
+                    <div class="info-inner">
+                        <div class="info-section">
+                            <h4>🎯 FPS e Precisione</h4>
+                            <table class="fps-table">
+                                <tr><th>FPS</th><th>Errore</th><th>Accuratezza</th></tr>
+                                <tr><td>30 FPS</td><td>±4-5 cm</td><td><span class="accuracy-badge accuracy-low">Bassa</span></td></tr>
+                                <tr><td>60 FPS</td><td>±2-3 cm</td><td><span class="accuracy-badge accuracy-med">Media</span></td></tr>
+                                <tr><td>120 FPS</td><td>±1-1.5 cm</td><td><span class="accuracy-badge accuracy-high">Alta</span></td></tr>
+                                <tr><td>240 FPS</td><td>±0.5 cm</td><td><span class="accuracy-badge accuracy-max">Massima</span></td></tr>
+                            </table>
+                        </div>
+                        <div class="info-section">
+                            <h4>📱 Impostazioni iPhone</h4>
+                            <ul>
+                                <li><strong>Impostazioni → Fotocamera → Registra Slow-mo</strong></li>
+                                <li>Seleziona <strong>1080p HD a 240 fps</strong></li>
+                                <li>In alternativa: 1080p a 120 fps</li>
+                            </ul>
+                        </div>
+                        <div class="info-section">
+                            <h4>🎬 Tecnica di Ripresa</h4>
+                            <ul>
+                                <li><strong>Posizione:</strong> Di lato, perpendicolare</li>
+                                <li><strong>Distanza:</strong> 3-5 metri</li>
+                                <li><strong>Altezza:</strong> A livello delle anche</li>
+                                <li><strong>Inquadratura:</strong> Piedi visibili + spazio sopra</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Benchmarks Info Box - UNIFIED with result bars -->
+            <div class="info-box" id="benchmarks-box">
+                <div class="info-header" onclick="toggleInfo('benchmarks-box')">
+                    <div class="info-title">
+                        <span>🏆</span> Benchmark per Sport (CMJ)
+                    </div>
+                    <span class="info-toggle">▼</span>
+                </div>
+                <div class="info-content">
+                    <div class="info-inner">
+                        <div class="sport-benchmarks" id="benchmark-list">
+                            <!-- Generated by JS to stay in sync -->
+                        </div>
+                        <div class="tip-highlight" style="margin-top: 0.8rem;">
+                            📊 Valori in <strong>cm</strong> per CMJ. Dati riferiti ad atleti maschi adulti.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jump Type Selector -->
+            <div class="jump-type-section">
+                <div class="section-label">Tipo di Salto</div>
+                <div class="jump-type-grid">
+                    <button class="jump-type-btn selected" data-type="CMJ">
+                        <div class="type-name">CMJ</div>
+                        <div class="type-desc">Counter Movement</div>
+                    </button>
+                    <button class="jump-type-btn" data-type="SJ">
+                        <div class="type-name">SJ</div>
+                        <div class="type-desc">Squat Jump</div>
+                    </button>
+                    <button class="jump-type-btn" data-type="DJ">
+                        <div class="type-name">DJ</div>
+                        <div class="type-desc">Drop Jump + RSI</div>
+                    </button>
+                    <button class="jump-type-btn" data-type="ABALAKOV">
+                        <div class="type-name">Abalakov</div>
+                        <div class="type-desc">CMJ + braccia</div>
+                    </button>
+                </div>
+                <div class="jump-type-note" id="jump-type-note"></div>
+            </div>
+
+            <!-- Upload Zone -->
+            <div id="upload-zone" class="upload-zone">
+                <div class="upload-icon">🎬</div>
+                <p class="upload-text">Carica Video del Salto</p>
+                <p class="upload-hint">Tocca per selezionare • MP4, MOV, WEBM</p>
+                <input type="file" id="video-input" accept="video/*">
+            </div>
+
+            <!-- Video Section -->
+            <div id="video-section" class="video-section">
+                <div class="video-wrapper">
+                    <video id="video-player" playsinline muted></video>
+                </div>
+
+                <div class="scrubber-container">
+                    <div class="frame-display">
+                        <span class="frame-info">Frame <span id="current-frame">0</span></span>
+                        <span class="time-info"><span id="current-time">0.000</span>s</span>
+                    </div>
+                    <input type="range" class="scrubber" id="scrubber" min="0" max="100" value="0" step="any">
+                </div>
+
+                <div class="video-controls">
+                    <button class="ctrl-btn" id="prev-frame">
+                        <span class="icon">◀◀</span>
+                        <span>-1 Frame</span>
+                    </button>
+                    <button class="ctrl-btn" id="play-pause">
+                        <span class="icon" id="play-icon">▶</span>
+                        <span id="play-text">Play</span>
+                    </button>
+                    <button class="ctrl-btn" id="next-frame">
+                        <span class="icon">▶▶</span>
+                        <span>+1 Frame</span>
+                    </button>
+                </div>
+
+                <!-- FPS Confirmation Banner -->
+                <div class="fps-confirm-banner" id="fps-confirm-banner">
+                    <div class="fps-confirm-text">
+                        FPS rilevato automaticamente: <strong id="fps-detected-value">30</strong><br>
+                        <span style="font-size: 0.75rem; color: rgba(245,245,245,0.6);">Conferma o seleziona manualmente</span>
+                    </div>
+                    <div class="fps-confirm-buttons">
+                        <button class="fps-confirm-btn confirm" id="fps-confirm-yes">✓ Conferma</button>
+                        <button class="fps-confirm-btn change" id="fps-confirm-no">Cambia</button>
+                    </div>
+                </div>
+
+                <!-- Mark Section - Dynamic based on jump type -->
+                <div class="mark-section">
+                    <div class="mark-buttons" id="mark-buttons">
+                        <button class="mark-btn takeoff-btn" id="mark-takeoff">
+                            <span class="label">🔴 Takeoff</span>
+                            <span class="frame-val" id="takeoff-frame">--</span>
+                        </button>
+                        <button class="mark-btn landing-btn" id="mark-landing">
+                            <span class="label">🔵 Landing</span>
+                            <span class="frame-val" id="landing-frame">--</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hidden contact button for DJ - added dynamically -->
+                <button class="mark-btn contact-btn" id="mark-contact" style="display:none;">
+                    <span class="label">🟣 Contact</span>
+                    <span class="frame-val" id="contact-frame">--</span>
+                </button>
+
+                <div class="fps-section">
+                    <div class="section-label">Frame Rate Video</div>
+                    <div class="fps-row">
+                        <select class="fps-select" id="fps-select">
+                            <option value="30">30 FPS (Standard)</option>
+                            <option value="60">60 FPS (High)</option>
+                            <option value="120">120 FPS (Slow-Mo)</option>
+                            <option value="240">240 FPS (iPhone Slow-Mo)</option>
+                            <option value="24">24 FPS (Cinema)</option>
+                            <option value="25">25 FPS (PAL)</option>
+                            <option value="custom">Personalizzato...</option>
+                        </select>
+                        <div class="fps-badge manual" id="fps-badge">MANUALE</div>
+                    </div>
+                    <input type="number" class="custom-fps-input" id="custom-fps" placeholder="FPS" min="1" max="1000">
+                </div>
+
+                <button class="calculate-btn" id="calculate-btn" disabled>
+                    Calcola Altezza Salto
+                </button>
+
+                <div class="results" id="results">
+                    <div class="result-label">Altezza del Salto</div>
+                    <div class="result-value">
+                        <span id="result-cm">0</span>
+                        <span class="result-unit">cm</span>
+                    </div>
+                    <div class="result-jump-type" id="result-jump-type">CMJ</div>
+                    <div class="result-stats" id="result-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="result-inches">0"</div>
+                            <div class="stat-label">Inches</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="flight-time">0s</div>
+                            <div class="stat-label">Flight Time</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="frame-count">0</div>
+                            <div class="stat-label">Frames</div>
+                        </div>
+                    </div>
+                    <div class="rating-badge" id="rating">-</div>
+
+                    <button class="share-btn" id="share-btn">
+                        📸 Condividi su Instagram
+                    </button>
+
+                    <div class="upsell-section">
+                        <div class="upsell-title" id="upsell-title">🚀 Migliora il Tuo Salto</div>
+                        <div class="upsell-cards">
+                            <a href="https://www.nicholasrubini.it/prodotto/defy-gravity/" target="_blank" class="upsell-card">
+                                <div class="upsell-card-header">
+                                    <span class="upsell-icon">🚀</span>
+                                    <span class="upsell-card-title">Defy Gravity</span>
+                                </div>
+                                <div class="upsell-card-desc">Programma di allenamento specifico per aumentare l'altezza del salto verticale.</div>
+                                <span class="upsell-card-cta">Scopri il programma →</span>
+                            </a>
+                            <a href="https://www.nicholasrubini.it/prodotto/allenare-la-forza-esplosiva/" target="_blank" class="upsell-card">
+                                <div class="upsell-card-header">
+                                    <span class="upsell-icon">🎓</span>
+                                    <span class="upsell-card-title">Allenare La Forza Esplosiva</span>
+                                </div>
+                                <div class="upsell-card-desc">Video corso completo sulla scienza dell'esplosività e del power training.</div>
+                                <span class="upsell-card-cta">Vai al corso →</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="benchmarks-section">
+                        <div class="benchmarks-title">Confronto Sport (CMJ)</div>
+                        <div id="benchmark-bars"></div>
+                    </div>
+                </div>
+
+                <button class="reset-btn" id="reset-btn">↻ Nuovo Video</button>
+
+                <div class="method-info">
+                    <strong>Formula:</strong> <code>h = (g × t²) / 8</code><br>
+                    <span id="method-extra">Metodo gold standard della biomeccanica.</span>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-brand">NICHOLAS RUBINI</div>
+            <div class="footer-rune">ᛟ ᚹ ᛁ ᚾ ᚾ</div>
+        </footer>
+    </div>
+
+    <canvas id="share-canvas" width="1080" height="1920"></canvas>
+
+    <div class="install-prompt" id="install-prompt">
+        <div class="install-content">
+            <div class="install-icon">📲</div>
+            <div class="install-text">
+                <strong>Installa HǪPP</strong>
+                <span>Tocca <strong>Condividi</strong> poi <strong>Aggiungi a Home</strong></span>
+            </div>
+            <button class="install-close" id="install-close">×</button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // UNIFIED SPORT BENCHMARKS - Single source of truth
+        // ============================================
+        const SPORT_BENCHMARKS = {
+            'Basket': { emoji: '🏀', avg: 50, good: 65, elite: 75 },
+            'Pallavolo': { emoji: '🏐', avg: 45, good: 60, elite: 70 },
+            'Calcio': { emoji: '⚽', avg: 40, good: 50, elite: 60 },
+            'Atletica': { emoji: '🏃', avg: 55, good: 70, elite: 80 },
+            'Football US': { emoji: '🏈', avg: 50, good: 65, elite: 80 },
+            'MMA': { emoji: '🥋', avg: 45, good: 55, elite: 65 },
+            'Kickboxing': { emoji: '🦵', avg: 45, good: 55, elite: 65 },
+            'Taekwondo': { emoji: '🥋', avg: 50, good: 60, elite: 70 },
+            'Boxe': { emoji: '🥊', avg: 40, good: 50, elite: 60 },
+            'Wrestling': { emoji: '🤼', avg: 45, good: 55, elite: 65 }
+        };
+
+        // Generate benchmark list in info box
+        function generateBenchmarkList() {
+            const container = document.getElementById('benchmark-list');
+            container.innerHTML = Object.entries(SPORT_BENCHMARKS).map(([sport, data]) => `
+                <div class="sport-row">
+                    <span class="sport-name">${data.emoji} ${sport}</span>
+                    <span class="sport-level level-avg">${data.avg}+</span>
+                    <span class="sport-level level-good">${data.good}+</span>
+                    <span class="sport-level level-elite">${data.elite}+</span>
+                </div>
+            `).join('');
+        }
+        generateBenchmarkList();
+
+        // ============================================
+        // TOGGLE INFO BOXES
+        // ============================================
+        function toggleInfo(id) {
+            document.getElementById(id).classList.toggle('open');
+        }
+
+        // ============================================
+        // SERVICE WORKER
+        // ============================================
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'hopp-v4';
+                self.addEventListener('install', e => self.skipWaiting());
+                self.addEventListener('activate', e => self.clients.claim());
+                self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+            `;
+            navigator.serviceWorker.register(URL.createObjectURL(new Blob([swCode], { type: 'application/javascript' }))).catch(() => {});
+        }
+
+        // iOS Install Prompt
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        
+        if (isIOS && !isStandalone && !localStorage.getItem('hopp-install-dismissed')) {
+            setTimeout(() => document.getElementById('install-prompt').classList.add('visible'), 3000);
+        }
+        
+        document.getElementById('install-close')?.addEventListener('click', () => {
+            document.getElementById('install-prompt').classList.remove('visible');
+            localStorage.setItem('hopp-install-dismissed', 'true');
+        });
+
+        // ============================================
+        // APP STATE
+        // ============================================
+        let videoFps = 30;
+        let fpsConfirmed = false;
+        let detectedFps = null;
+        let takeoffFrame = null;
+        let landingFrame = null;
+        let contactFrame = null; // For DJ
+        let selectedJumpType = 'CMJ';
+        let lastResultCm = 0;
+        let lastRSI = null;
+        let lastContactTime = null;
+
+        const jumpTypeInfo = {
+            'CMJ': { name: 'Counter Movement Jump', note: 'Salto con contromovimento. Braccia ai fianchi.' },
+            'SJ': { name: 'Squat Jump', note: 'Partenza da posizione statica di mezzo squat (90°), senza contromovimento. Braccia ai fianchi.' },
+            'DJ': { name: 'Drop Jump', note: 'Caduta da box + salto reattivo. Calcola anche RSI (Reactive Strength Index) = Altezza / Tempo di contatto.' },
+            'ABALAKOV': { name: 'Abalakov (CMJ + braccia)', note: 'Come il CMJ ma con slancio delle braccia. Misura la coordinazione arti superiori-inferiori.' }
+        };
+
+        // ============================================
+        // DOM ELEMENTS
+        // ============================================
+        const $ = id => document.getElementById(id);
+        const uploadZone = $('upload-zone');
+        const videoInput = $('video-input');
+        const videoSection = $('video-section');
+        const videoPlayer = $('video-player');
+        const scrubber = $('scrubber');
+        const currentFrameEl = $('current-frame');
+        const currentTimeEl = $('current-time');
+        const fpsSelect = $('fps-select');
+        const customFpsInput = $('custom-fps');
+        const fpsBadge = $('fps-badge');
+        const fpsConfirmBanner = $('fps-confirm-banner');
+        const calculateBtn = $('calculate-btn');
+        const results = $('results');
+        const markButtons = $('mark-buttons');
+        const jumpTypeNote = $('jump-type-note');
+
+        // ============================================
+        // JUMP TYPE SELECTOR
+        // ============================================
+        document.querySelectorAll('.jump-type-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.jump-type-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedJumpType = btn.dataset.type;
+                updateJumpTypeUI();
+            });
+        });
+
+        function updateJumpTypeUI() {
+            const info = jumpTypeInfo[selectedJumpType];
+            jumpTypeNote.textContent = info.note;
+            jumpTypeNote.classList.add('visible');
+            
+            // Update mark buttons for DJ (3 marks)
+            if (selectedJumpType === 'DJ') {
+                markButtons.classList.add('three-marks');
+                markButtons.innerHTML = `
+                    <button class="mark-btn contact-btn" id="mark-contact">
+                        <span class="label">🟣 Contact</span>
+                        <span class="frame-val" id="contact-frame">--</span>
+                    </button>
+                    <button class="mark-btn takeoff-btn" id="mark-takeoff">
+                        <span class="label">🔴 Takeoff</span>
+                        <span class="frame-val" id="takeoff-frame">--</span>
+                    </button>
+                    <button class="mark-btn landing-btn" id="mark-landing">
+                        <span class="label">🔵 Landing</span>
+                        <span class="frame-val" id="landing-frame">--</span>
+                    </button>
+                `;
+                // Re-attach listeners
+                attachMarkListeners();
+                $('method-extra').innerHTML = 'Per DJ: RSI = Altezza (m) / Contact Time (s)';
+            } else {
+                markButtons.classList.remove('three-marks');
+                markButtons.innerHTML = `
+                    <button class="mark-btn takeoff-btn" id="mark-takeoff">
+                        <span class="label">🔴 Takeoff</span>
+                        <span class="frame-val" id="takeoff-frame">--</span>
+                    </button>
+                    <button class="mark-btn landing-btn" id="mark-landing">
+                        <span class="label">🔵 Landing</span>
+                        <span class="frame-val" id="landing-frame">--</span>
+                    </button>
+                `;
+                attachMarkListeners();
+                $('method-extra').textContent = 'Metodo gold standard della biomeccanica.';
+            }
+            
+            // Reset marks
+            takeoffFrame = landingFrame = contactFrame = null;
+            checkReady();
+        }
+
+        function attachMarkListeners() {
+            $('mark-takeoff')?.addEventListener('click', () => {
+                takeoffFrame = getCurrentFrame();
+                $('takeoff-frame').textContent = takeoffFrame;
+                $('mark-takeoff').classList.add('marked');
+                checkReady();
+                vibrate();
+            });
+
+            $('mark-landing')?.addEventListener('click', () => {
+                landingFrame = getCurrentFrame();
+                $('landing-frame').textContent = landingFrame;
+                $('mark-landing').classList.add('marked');
+                checkReady();
+                vibrate();
+            });
+
+            $('mark-contact')?.addEventListener('click', () => {
+                contactFrame = getCurrentFrame();
+                $('contact-frame').textContent = contactFrame;
+                $('mark-contact').classList.add('marked');
+                checkReady();
+                vibrate();
+            });
+        }
+
+        // Initial attach
+        attachMarkListeners();
+
+        // ============================================
+        // VIDEO UPLOAD & AUTO FPS DETECTION
+        // ============================================
+        uploadZone.addEventListener('click', () => videoInput.click());
+
+        videoInput.addEventListener('change', e => {
+            if (e.target.files.length > 0) loadVideo(e.target.files[0]);
+        });
+
+        async function loadVideo(file) {
+            videoPlayer.src = URL.createObjectURL(file);
+            
+            videoPlayer.addEventListener('loadedmetadata', async () => {
+                uploadZone.style.display = 'none';
+                videoSection.classList.add('active');
+                
+                // Reset FPS state
+                fpsConfirmed = false;
+                detectedFps = null;
+                fpsBadge.textContent = 'MANUALE';
+                fpsBadge.className = 'fps-badge manual';
+                fpsConfirmBanner.classList.remove('visible');
+                
+                // Try to auto-detect FPS
+                await attemptFpsDetection();
+                
+                scrubber.max = videoPlayer.duration;
+                scrubber.step = 1 / videoFps;
+                videoPlayer.pause();
+                videoPlayer.currentTime = 0;
+                updateDisplay();
+            }, { once: true });
+        }
+
+        async function attemptFpsDetection() {
+            const commonFps = [24, 25, 30, 60, 120, 240];
+            
+            try {
+                // Method: requestVideoFrameCallback (most reliable)
+                if ('requestVideoFrameCallback' in HTMLVideoElement.prototype) {
+                    const detected = await detectFpsWithCallback();
+                    
+                    if (detected && detected >= 15 && detected <= 300) {
+                        // Round to nearest common FPS if close
+                        let finalFps = detected;
+                        for (const common of commonFps) {
+                            if (Math.abs(detected - common) <= 3) {
+                                finalFps = common;
+                                break;
+                            }
+                        }
+                        
+                        detectedFps = finalFps;
+                        
+                        // Show confirmation banner
+                        $('fps-detected-value').textContent = `${finalFps} FPS`;
+                        fpsConfirmBanner.classList.add('visible');
+                        
+                        // Pre-select in dropdown
+                        const matchingOption = Array.from(fpsSelect.options).find(opt => parseInt(opt.value) === finalFps);
+                        if (matchingOption) {
+                            fpsSelect.value = finalFps.toString();
+                        } else {
+                            fpsSelect.value = 'custom';
+                            customFpsInput.value = finalFps;
+                            customFpsInput.classList.add('visible');
+                        }
+                        videoFps = finalFps;
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn('FPS detection failed:', e);
+            }
+            
+            // Detection failed - keep manual mode
+            videoFps = 30;
+            fpsSelect.value = '30';
+        }
+
+        function detectFpsWithCallback() {
+            return new Promise((resolve) => {
+                const timestamps = [];
+                let frameCount = 0;
+                let resolved = false;
+                
+                const callback = (now, metadata) => {
+                    if (resolved) return;
+                    
+                    timestamps.push(metadata.mediaTime);
+                    frameCount++;
+                    
+                    if (frameCount >= 15 && timestamps.length >= 2) {
+                        resolved = true;
+                        videoPlayer.pause();
+                        videoPlayer.currentTime = 0;
+                        
+                        // Calculate average frame interval
+                        const intervals = [];
+                        for (let i = 1; i < timestamps.length; i++) {
+                            const delta = timestamps[i] - timestamps[i-1];
+                            if (delta > 0 && delta < 0.2) { // Sanity check
+                                intervals.push(delta);
+                            }
+                        }
+                        
+                        if (intervals.length >= 5) {
+                            // Use median to avoid outliers
+                            intervals.sort((a, b) => a - b);
+                            const median = intervals[Math.floor(intervals.length / 2)];
+                            const fps = Math.round(1 / median);
+                            resolve(fps);
+                        } else {
+                            resolve(null);
+                        }
+                        return;
+                    }
+                    
+                    if (frameCount < 20) {
+                        videoPlayer.requestVideoFrameCallback(callback);
+                    } else {
+                        resolved = true;
+                        videoPlayer.pause();
+                        videoPlayer.currentTime = 0;
+                        resolve(null);
+                    }
+                };
+                
+                // Start playback for detection
+                videoPlayer.currentTime = 0;
+                videoPlayer.requestVideoFrameCallback(callback);
+                
+                // Use muted inline playback
+                videoPlayer.muted = true;
+                videoPlayer.playsInline = true;
+                
+                const playPromise = videoPlayer.play();
+                if (playPromise) {
+                    playPromise.catch(() => {
+                        resolved = true;
+                        resolve(null);
+                    });
+                }
+                
+                // Timeout fallback
+                setTimeout(() => {
+                    if (!resolved) {
+                        resolved = true;
+                        videoPlayer.pause();
+                        videoPlayer.currentTime = 0;
+                        resolve(null);
+                    }
+                }, 2000);
+            });
+        }
+
+        // FPS Confirmation handlers
+        $('fps-confirm-yes').addEventListener('click', () => {
+            fpsConfirmed = true;
+            fpsBadge.textContent = 'AUTO';
+            fpsBadge.className = 'fps-badge auto';
+            fpsConfirmBanner.classList.remove('visible');
+            scrubber.step = 1 / videoFps;
+            updateDisplay();
+        });
+
+        $('fps-confirm-no').addEventListener('click', () => {
+            fpsConfirmBanner.classList.remove('visible');
+            fpsSelect.focus();
+        });
+
+        // ============================================
+        // VIDEO CONTROLS
+        // ============================================
+        const getCurrentFrame = () => Math.round(videoPlayer.currentTime * videoFps);
+
+        function updateDisplay() {
+            currentFrameEl.textContent = getCurrentFrame();
+            currentTimeEl.textContent = videoPlayer.currentTime.toFixed(3);
+            scrubber.value = videoPlayer.currentTime;
+        }
+
+        videoPlayer.addEventListener('timeupdate', updateDisplay);
+
+        scrubber.addEventListener('input', () => {
+            videoPlayer.currentTime = parseFloat(scrubber.value);
+            updateDisplay();
+        });
+
+        $('play-pause').addEventListener('click', () => {
+            if (videoPlayer.paused) {
+                videoPlayer.play();
+                $('play-icon').textContent = '⏸';
+                $('play-text').textContent = 'Pause';
+            } else {
+                videoPlayer.pause();
+                $('play-icon').textContent = '▶';
+                $('play-text').textContent = 'Play';
+            }
+        });
+
+        videoPlayer.addEventListener('pause', () => {
+            $('play-icon').textContent = '▶';
+            $('play-text').textContent = 'Play';
+        });
+
+        videoPlayer.addEventListener('play', () => {
+            $('play-icon').textContent = '⏸';
+            $('play-text').textContent = 'Pause';
+        });
+
+        function stepFrame(dir) {
+            videoPlayer.pause();
+            videoPlayer.currentTime = Math.max(0, Math.min(videoPlayer.duration, videoPlayer.currentTime + dir / videoFps));
+            updateDisplay();
+        }
+
+        $('prev-frame').addEventListener('click', () => stepFrame(-1));
+        $('next-frame').addEventListener('click', () => stepFrame(1));
+
+        // Touch hold
+        let stepInterval = null;
+        const startStep = dir => { stepFrame(dir); stepInterval = setInterval(() => stepFrame(dir), 100); };
+        const stopStep = () => { clearInterval(stepInterval); stepInterval = null; };
+
+        $('prev-frame').addEventListener('touchstart', e => { e.preventDefault(); startStep(-1); });
+        $('prev-frame').addEventListener('touchend', stopStep);
+        $('next-frame').addEventListener('touchstart', e => { e.preventDefault(); startStep(1); });
+        $('next-frame').addEventListener('touchend', stopStep);
+
+        // ============================================
+        // MARK FRAMES
+        // ============================================
+        function vibrate() { navigator.vibrate?.(50); }
+
+        function checkReady() {
+            if (selectedJumpType === 'DJ') {
+                calculateBtn.disabled = !(
+                    contactFrame !== null && 
+                    takeoffFrame !== null && 
+                    landingFrame !== null && 
+                    contactFrame < takeoffFrame && 
+                    takeoffFrame < landingFrame
+                );
+            } else {
+                calculateBtn.disabled = !(
+                    takeoffFrame !== null && 
+                    landingFrame !== null && 
+                    landingFrame > takeoffFrame
+                );
+            }
+        }
+
+        // ============================================
+        // FPS SELECTION
+        // ============================================
+        fpsSelect.addEventListener('change', () => {
+            fpsConfirmed = false;
+            fpsBadge.textContent = 'MANUALE';
+            fpsBadge.className = 'fps-badge manual';
+            
+            if (fpsSelect.value === 'custom') {
+                customFpsInput.classList.add('visible');
+                customFpsInput.focus();
+            } else {
+                customFpsInput.classList.remove('visible');
+                videoFps = parseInt(fpsSelect.value);
+                scrubber.step = 1 / videoFps;
+                updateDisplay();
+            }
+        });
+
+        customFpsInput.addEventListener('input', () => {
+            const v = parseInt(customFpsInput.value);
+            if (v > 0) { 
+                videoFps = v; 
+                scrubber.step = 1 / videoFps; 
+                updateDisplay(); 
+            }
+        });
+
+        // ============================================
+        // CALCULATE
+        // ============================================
+        calculateBtn.addEventListener('click', () => {
+            const flightFrames = landingFrame - takeoffFrame;
+            const flightTime = flightFrames / videoFps;
+            const h = (9.81 * flightTime * flightTime) / 8 * 100;
+            lastResultCm = h;
+            lastRSI = null;
+            lastContactTime = null;
+
+            $('result-cm').textContent = h.toFixed(1);
+            $('result-jump-type').textContent = jumpTypeInfo[selectedJumpType].name;
+            $('rating').textContent = getRating(h);
+            
+            // Update stats based on jump type
+            const statsContainer = $('result-stats');
+            
+            if (selectedJumpType === 'DJ') {
+                // Calculate contact time and RSI
+                const contactFrames = takeoffFrame - contactFrame;
+                lastContactTime = contactFrames / videoFps;
+                lastRSI = (h / 100) / lastContactTime; // RSI = height(m) / contact time(s)
+                
+                statsContainer.className = 'result-stats four-cols';
+                statsContainer.innerHTML = `
+                    <div class="stat-item">
+                        <div class="stat-value">${(h / 2.54).toFixed(1)}"</div>
+                        <div class="stat-label">Inches</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${flightTime.toFixed(3)}s</div>
+                        <div class="stat-label">Flight</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${(lastContactTime * 1000).toFixed(0)}ms</div>
+                        <div class="stat-label">Contact</div>
+                    </div>
+                    <div class="stat-item rsi-highlight">
+                        <div class="stat-value">${lastRSI.toFixed(2)}</div>
+                        <div class="stat-label">RSI</div>
+                    </div>
+                `;
+            } else {
+                statsContainer.className = 'result-stats';
+                statsContainer.innerHTML = `
+                    <div class="stat-item">
+                        <div class="stat-value">${(h / 2.54).toFixed(1)}"</div>
+                        <div class="stat-label">Inches</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${flightTime.toFixed(3)}s</div>
+                        <div class="stat-label">Flight Time</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${flightFrames}</div>
+                        <div class="stat-label">Frames</div>
+                    </div>
+                `;
+            }
+            
+            updateUpsellMessage(h);
+            generateBenchmarkBars(h);
+
+            results.classList.add('visible');
+            results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            navigator.vibrate?.([50, 50, 100]);
+        });
+
+        function getRating(h) {
+            if (h >= 80) return '⚡ ÉLITE';
+            if (h >= 65) return '🔥 ECCELLENTE';
+            if (h >= 50) return '✓ BUONO';
+            if (h >= 40) return '→ NELLA MEDIA';
+            if (h >= 30) return '↗ DA MIGLIORARE';
+            return '🎯 PRINCIPIANTE';
+        }
+
+        function updateUpsellMessage(h) {
+            const title = $('upsell-title');
+            if (h < 40) {
+                title.textContent = '🚀 Costruisci le Basi dell\'Esplosività';
+            } else if (h < 55) {
+                title.textContent = '📈 Porta il Tuo Salto al Livello Successivo';
+            } else if (h < 70) {
+                title.textContent = '🔥 Raggiungi il Livello Élite';
+            } else {
+                title.textContent = '⚡ Perfeziona la Tua Esplosività';
+            }
+        }
+
+        function generateBenchmarkBars(heightCm) {
+            const container = $('benchmark-bars');
+            container.innerHTML = '';
+            const maxHeight = 90;
+            
+            // Use same SPORT_BENCHMARKS as the info box
+            Object.entries(SPORT_BENCHMARKS).forEach(([sport, data]) => {
+                const bar = document.createElement('div');
+                bar.className = 'benchmark-bar';
+                const fillWidth = Math.min(100, (data.elite / maxHeight) * 100);
+                const markerPos = Math.min(98, Math.max(2, (heightCm / maxHeight) * 100));
+                
+                bar.innerHTML = `
+                    <div class="benchmark-fill" style="width: ${fillWidth}%"></div>
+                    <div class="benchmark-marker" style="left: ${markerPos}%"></div>
+                    <div class="benchmark-labels">
+                        <span class="benchmark-sport">${data.emoji} ${sport}</span>
+                        <span class="benchmark-range">${data.avg}/${data.good}/${data.elite}</span>
+                    </div>
+                `;
+                container.appendChild(bar);
+            });
+        }
+
+        // ============================================
+        // SHARE IMAGE GENERATION
+        // ============================================
+        $('share-btn').addEventListener('click', generateShareImage);
+
+        async function generateShareImage() {
+            const canvas = $('share-canvas');
+            const ctx = canvas.getContext('2d');
+            const w = 1080, h = 1920;
+            
+            // Background
+            ctx.fillStyle = '#0D0D0D';
+            ctx.fillRect(0, 0, w, h);
+            
+            // Gold gradient
+            const gradient = ctx.createRadialGradient(w/2, h/3, 0, w/2, h/3, w);
+            gradient.addColorStop(0, 'rgba(212, 175, 55, 0.15)');
+            gradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, w, h);
+            
+            // Rune logo
+            ctx.fillStyle = '#D4AF37';
+            ctx.font = '80px serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('ᚺ ᛟ ᛈ ᛈ', w/2, 200);
+            
+            // Title
+            ctx.fillStyle = '#F5F5F5';
+            ctx.font = 'bold 72px Georgia, serif';
+            ctx.fillText('HǪPP', w/2, 320);
+            
+            // Jump type
+            ctx.fillStyle = 'rgba(245, 245, 245, 0.6)';
+            ctx.font = '36px Arial, sans-serif';
+            ctx.fillText(jumpTypeInfo[selectedJumpType].name, w/2, 400);
+            
+            // Main result
+            ctx.fillStyle = '#D4AF37';
+            ctx.font = 'bold 280px Georgia, serif';
+            ctx.fillText(lastResultCm.toFixed(1), w/2, 750);
+            
+            // Unit
+            ctx.fillStyle = 'rgba(245, 245, 245, 0.8)';
+            ctx.font = 'bold 80px Georgia, serif';
+            ctx.fillText('cm', w/2, 860);
+            
+            // Rating badge
+            const rating = getRating(lastResultCm);
+            ctx.fillStyle = '#1A1A1A';
+            ctx.beginPath();
+            ctx.roundRect(w/2 - 200, 920, 400, 80, 40);
+            ctx.fill();
+            ctx.strokeStyle = '#D4AF37';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            ctx.fillStyle = '#D4AF37';
+            ctx.font = 'bold 40px Georgia, serif';
+            ctx.fillText(rating, w/2, 975);
+            
+            // Extra stats for DJ
+            ctx.fillStyle = 'rgba(245, 245, 245, 0.5)';
+            ctx.font = '32px Arial, sans-serif';
+            if (selectedJumpType === 'DJ' && lastRSI) {
+                ctx.fillText(`RSI: ${lastRSI.toFixed(2)} • Contact: ${(lastContactTime * 1000).toFixed(0)}ms`, w/2, 1100);
+            } else {
+                const inches = (lastResultCm / 2.54).toFixed(1);
+                ctx.fillText(`${inches}" • ${$('flight-time')?.textContent || ''}`, w/2, 1100);
+            }
+            
+            // Branding
+            ctx.fillStyle = '#D4AF37';
+            ctx.font = 'bold 36px Georgia, serif';
+            ctx.fillText('NICHOLAS RUBINI', w/2, 1700);
+            
+            ctx.font = '32px serif';
+            ctx.fillText('ᛟ ᚹ ᛁ ᚾ ᚾ', w/2, 1760);
+            
+            ctx.fillStyle = 'rgba(245, 245, 245, 0.4)';
+            ctx.font = '28px Arial, sans-serif';
+            ctx.fillText('nicholasrubini.it', w/2, 1820);
+            
+            // Share/Download
+            try {
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                const file = new File([blob], 'hopp-result.png', { type: 'image/png' });
+                
+                if (navigator.canShare?.({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Il mio salto - HǪPP',
+                        text: `Ho saltato ${lastResultCm.toFixed(1)}cm! 🚀`
+                    });
+                } else {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'hopp-result.png';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                }
+            } catch (e) {
+                console.error('Share failed:', e);
+            }
+        }
+
+        // ============================================
+        // RESET
+        // ============================================
+        $('reset-btn').addEventListener('click', () => {
+            takeoffFrame = landingFrame = contactFrame = null;
+            results.classList.remove('visible');
+            calculateBtn.disabled = true;
+            uploadZone.style.display = 'block';
+            videoSection.classList.remove('active');
+            videoPlayer.src = '';
+            videoInput.value = '';
+            fpsConfirmBanner.classList.remove('visible');
+            fpsConfirmed = false;
+            detectedFps = null;
+            fpsBadge.textContent = 'MANUALE';
+            fpsBadge.className = 'fps-badge manual';
+            
+            // Reset marks UI
+            updateJumpTypeUI();
+        });
+
+        // Prevent double-tap zoom
+        let lastTouch = 0;
+        document.addEventListener('touchend', e => {
+            const now = Date.now();
+            if (now - lastTouch <= 300) e.preventDefault();
+            lastTouch = now;
+        }, false);
+    </script>
+</body>
+</html>
